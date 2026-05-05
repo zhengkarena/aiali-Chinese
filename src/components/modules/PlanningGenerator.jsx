@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Cell,
   Pie,
@@ -398,6 +398,14 @@ export default function PlanningGenerator() {
   const [error, setError] = useState('')
   const [plan, setPlan] = useState(null)
   const [revealStep, setRevealStep] = useState(0)
+  const timersRef = useRef([])
+
+  useEffect(
+    () => () => {
+      timersRef.current.forEach(clearTimeout)
+    },
+    [],
+  )
 
   const update = (key, value) => setForm((f) => ({ ...f, [key]: value }))
 
@@ -411,12 +419,15 @@ export default function PlanningGenerator() {
       return
     }
     setError('')
+    timersRef.current.forEach(clearTimeout)
+    timersRef.current = []
     const p = generatePlan(form)
     setPlan(p)
     setRevealStep(0)
     const delays = [120, 480, 880, 1280]
     delays.forEach((d, i) => {
-      setTimeout(() => setRevealStep(i + 1), d)
+      const t = setTimeout(() => setRevealStep(i + 1), d)
+      timersRef.current.push(t)
     })
   }
 

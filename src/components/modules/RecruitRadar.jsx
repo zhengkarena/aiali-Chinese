@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowDown,
   ArrowUp,
   CheckCircle2,
+  Loader2,
   MessageSquare,
   RotateCcw,
   Search,
@@ -152,6 +153,24 @@ export default function RecruitRadar() {
   const [search, setSearch] = useState('')
   const [sortDir, setSortDir] = useState('desc')
   const [pitchOf, setPitchOf] = useState(null)
+  const [generating, setGenerating] = useState(false)
+  const generateTimerRef = useRef(null)
+
+  useEffect(
+    () => () => {
+      if (generateTimerRef.current) clearTimeout(generateTimerRef.current)
+    },
+    [],
+  )
+
+  const handleGenerate = () => {
+    if (generateTimerRef.current) clearTimeout(generateTimerRef.current)
+    setGenerating(true)
+    generateTimerRef.current = setTimeout(() => {
+      setApplied({ category, market })
+      setGenerating(false)
+    }, 200)
+  }
 
   const rows = useMemo(() => {
     const kw = search.trim()
@@ -234,10 +253,18 @@ export default function RecruitRadar() {
           </div>
           <button
             type="button"
-            onClick={() => setApplied({ category, market })}
-            className="rounded-md bg-temu px-4 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-temu-600"
+            disabled={generating}
+            onClick={handleGenerate}
+            className="inline-flex items-center gap-1.5 rounded-md bg-temu px-4 py-1.5 text-sm font-medium text-white shadow-sm transition-opacity hover:bg-temu-600 disabled:opacity-70"
           >
-            生成招商名单
+            {generating ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                生成中...
+              </>
+            ) : (
+              '生成招商名单'
+            )}
           </button>
           {(applied.category !== '全部' || applied.market !== '全部') && (
             <button

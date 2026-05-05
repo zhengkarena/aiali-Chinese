@@ -69,7 +69,7 @@ export default function Sidebar({ active, onChange }) {
         })}
       </nav>
       <div className="border-t border-slate-800 px-5 py-3 text-[11px] text-slate-500">
-        v0.1.0 · 内部演示版本
+        v1.0.0 · 内部演示版本
       </div>
     </aside>
   )

@@ -32,6 +32,9 @@ function App() {
             <div className="mt-6">
               <ActiveModule />
             </div>
+            <div className="mt-8 pb-2 text-right text-[11px] text-slate-400">
+              智选 · Temu 商家工作台 · v1.0.0 · 2026-05
+            </div>
           </main>
         </div>
         {uploadOpen && <UploadModal onClose={() => setUploadOpen(false)} />}
