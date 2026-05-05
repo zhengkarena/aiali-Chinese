@@ -12,6 +12,7 @@ import {
   Compass,
   Package,
   Rocket,
+  RotateCcw,
   Target,
 } from 'lucide-react'
 import {
@@ -20,6 +21,7 @@ import {
   PRICE_BANDS,
   generatePlan,
 } from '../../data/planningRules.js'
+import { useData } from '../../context/DataContext.jsx'
 
 const SKU_LABELS = {
   traffic: '引流款',
@@ -388,6 +390,10 @@ const FORM_DEFAULTS = {
 }
 
 export default function PlanningGenerator() {
+  const { datasets, clearDataset } = useData()
+  const planningData = datasets.planning
+  const isReal = !!planningData
+
   const [form, setForm] = useState(FORM_DEFAULTS)
   const [error, setError] = useState('')
   const [plan, setPlan] = useState(null)
@@ -419,9 +425,27 @@ export default function PlanningGenerator() {
       <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">
-              新商 90 天落地规划器
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-slate-900">
+                新商 90 天落地规划器
+              </h2>
+              {isReal && (
+                <>
+                  <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                    <CheckCircle2 size={11} />
+                    使用真实数据 · {planningData.length} 条新商档案
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => clearDataset('planning')}
+                    className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-700"
+                  >
+                    <RotateCcw size={10} />
+                    恢复默认 Mock 数据
+                  </button>
+                </>
+              )}
+            </div>
             <p className="mt-1 text-sm text-slate-500">
               输入新商基础信息，自动生成市场定位 + 商品规划 + 90 天节奏 + KPI 目标
             </p>

@@ -10,14 +10,15 @@ import {
   YAxis,
   ZAxis,
 } from 'recharts'
-import { Search } from 'lucide-react'
+import { CheckCircle2, RotateCcw, Search } from 'lucide-react'
 import {
   CATEGORIES,
   QUADRANT_META,
   QUADRANT_STRATEGIES,
   QUADRANT_THRESHOLDS,
-  tieringData,
+  tieringData as defaultTieringData,
 } from '../../data/tieringData.js'
+import { useData } from '../../context/DataContext.jsx'
 
 const QUADRANT_KEYS = ['star', 'potential', 'cashcow', 'optimize']
 
@@ -126,6 +127,10 @@ function StrategyCard({ qkey }) {
 }
 
 export default function TieringDashboard() {
+  const { datasets, clearDataset } = useData()
+  const tieringData = datasets.tiering || defaultTieringData
+  const isReal = !!datasets.tiering
+
   const [activeQuadrant, setActiveQuadrant] = useState('star')
   const [filterQuadrants, setFilterQuadrants] = useState(new Set(QUADRANT_KEYS))
   const [filterCategory, setFilterCategory] = useState('全部')
@@ -133,15 +138,17 @@ export default function TieringDashboard() {
 
   const counts = useMemo(() => {
     const c = { star: 0, potential: 0, cashcow: 0, optimize: 0 }
-    tieringData.forEach((m) => (c[m.quadrant] += 1))
+    tieringData.forEach((m) => (c[m.quadrant] = (c[m.quadrant] || 0) + 1))
     return c
-  }, [])
+  }, [tieringData])
 
   const dataByQuadrant = useMemo(() => {
     const g = { star: [], potential: [], cashcow: [], optimize: [] }
-    tieringData.forEach((m) => g[m.quadrant].push(m))
+    tieringData.forEach((m) => {
+      if (g[m.quadrant]) g[m.quadrant].push(m)
+    })
     return g
-  }, [])
+  }, [tieringData])
 
   const tableRows = useMemo(() => {
     const kw = search.trim()
@@ -151,7 +158,7 @@ export default function TieringDashboard() {
       if (kw && !m.name.includes(kw)) return false
       return true
     })
-  }, [filterQuadrants, filterCategory, search])
+  }, [tieringData, filterQuadrants, filterCategory, search])
 
   const toggleQuadrantFilter = (k) => {
     setFilterQuadrants((prev) => {
@@ -168,7 +175,27 @@ export default function TieringDashboard() {
       <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">分层运营驾驶舱</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-slate-900">
+                分层运营驾驶舱
+              </h2>
+              {isReal && (
+                <>
+                  <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                    <CheckCircle2 size={11} />
+                    使用真实数据 · {tieringData.length} 条
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => clearDataset('tiering')}
+                    className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-700"
+                  >
+                    <RotateCcw size={10} />
+                    恢复默认 Mock 数据
+                  </button>
+                </>
+              )}
+            </div>
             <p className="mt-1 text-sm text-slate-500">
               按 GMV × 成长率四象限管理在管商家，每象限对应差异化运营策略
             </p>

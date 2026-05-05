@@ -1,11 +1,21 @@
 import { useMemo, useState } from 'react'
-import { ArrowDown, ArrowUp, MessageSquare, Search, X, Zap } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2,
+  MessageSquare,
+  RotateCcw,
+  Search,
+  X,
+  Zap,
+} from 'lucide-react'
 import {
   CATEGORIES,
   FIT_FORMULA,
   MARKETS,
-  recruitData,
+  recruitData as defaultRecruitData,
 } from '../../data/recruitData.js'
+import { useData } from '../../context/DataContext.jsx'
 
 function formatGmv(n) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
@@ -132,6 +142,10 @@ function FormulaCard() {
 }
 
 export default function RecruitRadar() {
+  const { datasets, clearDataset } = useData()
+  const recruitData = datasets.recruit || defaultRecruitData
+  const isReal = !!datasets.recruit
+
   const [category, setCategory] = useState('全部')
   const [market, setMarket] = useState('全部')
   const [applied, setApplied] = useState({ category: '全部', market: '全部' })
@@ -151,14 +165,32 @@ export default function RecruitRadar() {
       sortDir === 'desc' ? b.fit_score - a.fit_score : a.fit_score - b.fit_score,
     )
     return filtered
-  }, [applied, search, sortDir])
+  }, [recruitData, applied, search, sortDir])
 
   return (
     <div className="space-y-6">
       <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">招商雷达</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-slate-900">招商雷达</h2>
+              {isReal && (
+                <>
+                  <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                    <CheckCircle2 size={11} />
+                    使用真实数据 · {recruitData.length} 条
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => clearDataset('recruit')}
+                    className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-700"
+                  >
+                    <RotateCcw size={10} />
+                    恢复默认 Mock 数据
+                  </button>
+                </>
+              )}
+            </div>
             <p className="mt-1 text-sm text-slate-500">
               输入目标品类与市场，输出按契合度排序的候选品牌招募名单
             </p>

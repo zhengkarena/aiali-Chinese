@@ -1,6 +1,6 @@
 import { Upload } from 'lucide-react'
 
-export default function TopBar() {
+export default function TopBar({ onUploadClick }) {
   return (
     <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
       <div>
@@ -17,7 +17,7 @@ export default function TopBar() {
         </span>
         <button
           type="button"
-          onClick={() => console.log('上传数据 modal 待实现')}
+          onClick={onUploadClick}
           className="inline-flex items-center gap-2 rounded-md bg-temu px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-temu-600"
         >
           <Upload size={16} />

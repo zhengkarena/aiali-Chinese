@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef } from 'react'
+import { useData } from '../../context/DataContext.jsx'
 import {
   Bar,
   BarChart,
@@ -19,6 +20,7 @@ import {
 } from 'recharts'
 import {
   Calendar,
+  CheckCircle2,
   Download,
   FileSpreadsheet,
   RotateCcw,
@@ -577,7 +579,11 @@ function AnalysisReport({ analysis, onReset }) {
 // ─── 主组件 ───
 
 export default function IndustryInsight() {
-  const [analysis, setAnalysis] = useState(null)
+  const { datasets, setDataset, clearDataset } = useData()
+  const insightData = datasets.insight
+  const analysis = insightData
+    ? { rowCount: insightData.rowCount, fileName: insightData.__fileName || '上传文件' }
+    : null
 
   const handleUpload = (file) => {
     const reader = new FileReader()
@@ -585,7 +591,9 @@ export default function IndustryInsight() {
       const text = String(e.target?.result || '')
       const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0)
       const rowCount = Math.max(1, lines.length - 1) // 减去表头
-      setAnalysis({ rowCount, fileName: file.name })
+      const payload = { rowCount, rows: [] }
+      payload.__fileName = file.name
+      setDataset('insight', payload)
     }
     reader.readAsText(file)
   }
@@ -595,9 +603,17 @@ export default function IndustryInsight() {
       <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">
-              行业洞察与需求挖掘
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-slate-900">
+                行业洞察与需求挖掘
+              </h2>
+              {analysis && (
+                <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                  <CheckCircle2 size={11} />
+                  使用真实数据 · {analysis.rowCount} 条
+                </span>
+              )}
+            </div>
             <p className="mt-1 text-sm text-slate-500">
               类目大盘趋势 + 商家评论 / 客服记录的 AI 需求挖掘
             </p>
@@ -643,7 +659,7 @@ export default function IndustryInsight() {
           {analysis ? (
             <AnalysisReport
               analysis={analysis}
-              onReset={() => setAnalysis(null)}
+              onReset={() => clearDataset('insight')}
             />
           ) : (
             <EmptyUploadState onUpload={handleUpload} />
