@@ -36,7 +36,7 @@ export default function Sidebar({ active, onChange }) {
         </div>
         <div className="leading-tight">
           <div className="text-sm font-semibold">智选工作台</div>
-          <div className="text-[11px] text-slate-400">Temu Merchant Console</div>
+          <div className="text-[11px] text-slate-400">跨境电商商家工作台</div>
         </div>
       </div>
       <nav className="flex-1 px-3 py-4">

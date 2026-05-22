@@ -33,7 +33,7 @@ function App() {
               <ActiveModule />
             </div>
             <div className="mt-8 pb-2 text-right text-[11px] text-slate-400">
-              智选 · Temu 商家工作台 · v1.0.0 · 2026-05
+              智选 · 跨境电商商家工作台 · v1.0.0 · 2026-05
             </div>
           </main>
         </div>
